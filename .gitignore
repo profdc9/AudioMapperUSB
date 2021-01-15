@@ -2,6 +2,7 @@
 *.a
 *.zip
 Ignore/
+src/
 
 # Temporary files
 *.000
