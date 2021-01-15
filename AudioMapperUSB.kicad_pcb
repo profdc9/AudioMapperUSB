@@ -5,7 +5,7 @@
     (no_connects 0)
     (area 29.924999 29.924999 130.075001 130.075001)
     (thickness 1.6)
-    (drawings 37)
+    (drawings 38)
     (tracks 1197)
     (zones 0)
     (modules 155)
@@ -37,7 +37,7 @@
   )
 
   (setup
-    (last_trace_width 0.35)
+    (last_trace_width 0.25)
     (user_trace_width 0.35)
     (user_trace_width 0.5)
     (user_trace_width 1)
@@ -6349,6 +6349,9 @@
     )
   )
 
+  (gr_text "CENTER PIN +" (at 60.5 43.5) (layer F.SilkS)
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
   (gr_text EXT (at 102.75 41.25) (layer F.SilkS)
     (effects (font (size 1 1) (thickness 0.15)))
   )
