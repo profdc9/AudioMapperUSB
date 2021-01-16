@@ -15,3 +15,5 @@ It is based on the PCM2900/PCM2902 TI USB CODEC DAC/ADC.  It has the following f
 - Feedback resistors can be surface mount or through hole for easy gain adjustments.
 
 The kicad files and gerbers are provided.  The project is licensed under the Creative Common License, CC-BY-SA 4.0.
+
+![PCB](AudioMapperUSB.png)
