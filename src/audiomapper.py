@@ -527,9 +527,10 @@ class GraphPanel(wx.Panel):
         self.Refresh()
         
 class SpeakerPanel(wx.Panel):    
-    def __init__(self, *args, **kwargs):
-        super(SpeakerPanel,self).__init__(*args, **kwargs)
+    def __init__(self, parent, appframe):
+        super(SpeakerPanel,self).__init__(parent)
         
+        self.appframe = appframe
         self.left_speaker_on = False
         self.right_speaker_on = False
         self.speakersizehorizontal = 0.05
@@ -546,7 +547,9 @@ class SpeakerPanel(wx.Panel):
         self.lineColour = colourDatabase.Find(u"RED")
         self.backgroundColour = colourDatabase.Find(u"WHITE")
         self.speakerColour = colourDatabase.Find(u"PINK")
-        self.microphoneColour = colourDatabase.Find(u"MAROON")
+        self.microphoneLineColour = colourDatabase.Find(u"BLACK")
+        self.microphoneActiveColour = colourDatabase.Find(u"GREEN")
+        self.microphoneInActiveColour = colourDatabase.Find(u"RED")
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_SIZE, self.OnSize)
 
@@ -594,13 +597,15 @@ class SpeakerPanel(wx.Panel):
                 fracy-1.2*self.speakersizevertical,2.4*self.speakersizehorizontal,
                 2.4*self.speakersizevertical, 45, 135)            
             
-    def DrawMicrophone(self, fracx, fracy):
+    def DrawMicrophone(self, micx, micy, active=True):
+        fracx = 0.5 - micx * self.speakerfromcenter
+        fracy = self.speakerverticalplacement - micy * self.speakerfromcenter
         dc = wx.PaintDC(self)
-        dc.SetPen(wx.Pen(self.lineColour))
-        dc.SetBrush(wx.Brush(self.speakerColour))
+        colour = self.microphoneActiveColour if active else self.microphoneInActiveColour
+        dc.SetPen(wx.Pen(self.microphoneLineColour))
+        dc.SetBrush(wx.Brush(colour))
         self.DrawProportionalRectangle(fracx-0.125*self.speakersizehorizontal,
             fracy,0.25*self.speakersizehorizontal,0.5*self.speakersizevertical)
-        dc.SetBrush(wx.Brush(self.microphoneColour))
         self.DrawProportionalEllipse(fracx-0.2*self.speakersizehorizontal,
             fracy-0.5*self.speakersizevertical, 0.4*self.speakersizehorizontal,
             0.6*self.speakersizevertical)
@@ -635,12 +640,14 @@ class SpeakerPanel(wx.Panel):
         dc.DrawBitmap(self.bt, 0, 0)
         dc.SetPen(wx.Pen(self.lineColour))
         dc.SetBrush(wx.Brush(self.backgroundColour))
-        #dc.DrawRectangle(0, 0, width-1, height-1)
         self.DrawSpeaker(0.5 - self.speakerfromcenter, self.speakerverticalplacement,self.left_speaker_on)
         self.DrawSpeaker(0.5 + self.speakerfromcenter, self.speakerverticalplacement,self.right_speaker_on)
-        micx = 0.5 - self.microphonex * self.speakerfromcenter
-        micy = self.speakerverticalplacement - self.microphoney * self.speakerfromcenter
-        self.DrawMicrophone(micx,micy)
+        self.DrawMicrophone(self.microphonex,self.microphoney)
+        reflectionList, drawPositions = self.appframe.GetReflectionList()
+        if drawPositions:
+            micPositionList = reflectionList.GetMicrophonePositions()
+            for micPosition in micPositionList:
+                self.DrawMicrophone(micPosition[0]/micPosition[2],micPosition[1]/micPosition[2],micPosition[3])
                 
     def OnSize(self, e):
         self.Refresh()
@@ -665,6 +672,18 @@ class SpeakerPanel(wx.Panel):
         if channel == 2 or channel < 0:
             dlymap = reflection.ComputeMap(2, self.speakerfromcenter, self.speakerverticalplacement, self.reflections.shape)
             self.AddToReflections(dlymap)
+            
+    def OnSpeakerPanelClicked(self, e):
+        width, height = self.GetSize()
+        dc = wx.ClientDC(self)
+        pt = e.GetLogicalPosition(dc)
+        xrel = (0.5 - pt.x/width)/self.speakerfromcenter
+        yrel = (self.speakerverticalplacement - pt.y/height)/self.speakerfromcenter
+        reflectionList, drawPositions = self.appframe.GetReflectionList()
+        if drawPositions:
+            if reflectionList.ToggleReflection(xrel,yrel):
+                self.Refresh()
+        e.Skip()
                     
 class Reflection():
     def __init__(self):
@@ -702,8 +721,15 @@ class Reflection():
         self.par['left_delay'] = left_delay
         self.par['right_delay'] = right_delay
         self.par['x'] = x
-        self.par['y'] = y        
+        self.par['y'] = y
+        self.par['enabled'] = True
 
+    def GetEnabled(self):
+        return self.par['enabled'] if 'enabled' in self.par else True
+
+    def SetEnabled(self,value):
+        self.par['enabled']=value
+        
     def GetSampleRate(self):
         return self.par['sample_rate']
         
@@ -835,7 +861,34 @@ class ReflectionList():
     def RefreshMap(self, speakerPanel):
         speakerPanel.ClearReflections()
         for ref in self.reflections:
-            speakerPanel.AddReflections(ref, -1)    
+            if ref.GetEnabled():
+                speakerPanel.AddReflections(ref, -1)    
+
+    def GetMicrophonePositions(self):
+        positions = []
+        for ref in self.reflections:
+            x,y = ref.GetMicrophonePosition()
+            x0 = ref.GetInterSpeakerDelay()
+            en = ref.GetEnabled()
+            positions.append((x,y,x0,en))
+        return positions
+        
+    def ToggleReflection(self, xrel, yrel):
+        minref = None
+        mindist = 1e38
+        for ref in self.reflections:
+            x,y = ref.GetMicrophonePosition()
+            dly = ref.GetInterSpeakerDelay()
+            x = x/dly
+            y = y/dly
+            dist = math.sqrt((xrel-x)*(xrel-x)+(yrel-y)*(yrel-y))
+            if dist < mindist:
+                mindist = dist
+                minref = ref
+        if (not minref is None) and (mindist < 0.1):
+            minref.SetEnabled(not minref.GetEnabled())
+            return True
+        return False
         
 class AudioMapperFrame(wx.Frame):
 
@@ -846,7 +899,8 @@ class AudioMapperFrame(wx.Frame):
         self.changedReflections = False
         
         self.panel = wx.Panel(self)
-        self.speakerPanel = SpeakerPanel(self.panel)
+        self.speakerPanel = SpeakerPanel(self.panel, self)
+        self.speakerPanel.Bind(wx.EVT_LEFT_DOWN, self.speakerPanel.OnSpeakerPanelClicked)
         
         self.leftGraphPanel = GraphPanel(self.panel)
         self.rightGraphPanel = GraphPanel(self.panel)
@@ -864,11 +918,15 @@ class AudioMapperFrame(wx.Frame):
         self.buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
         self.sampleButton = wx.Button(self.panel, label=u"Sample")
         self.buttonSizer.Add(self.sampleButton, 0, wx.FIXED_MINSIZE|wx.ALL, 5)
-        self.Bind(wx.EVT_BUTTON, self.SampleButtonClicked, id=self.sampleButton.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnSampleButtonClicked, id=self.sampleButton.GetId())
         
         self.addSignalCheck = wx.CheckBox(self.panel, label="Add Signal")
         self.buttonSizer.Add(self.addSignalCheck, 0, wx.FIXED_MINSIZE|wx.ALL, 5)
 
+        self.displayPositionsCheck = wx.CheckBox(self.panel, label="Display Positions")
+        self.buttonSizer.Add(self.displayPositionsCheck, 0, wx.FIXED_MINSIZE|wx.ALL, 5)
+        self.displayPositionsCheck.Bind(wx.EVT_CHECKBOX, self.OnDisplayPositionsChecked)
+        
         self.delayStaticText = wx.StaticText(self.panel,label="")
         self.buttonSizer.Add(self.delayStaticText, 1, wx.EXPAND|wx.ALIGN_TOP|wx.ALL, 5)
         
@@ -876,7 +934,7 @@ class AudioMapperFrame(wx.Frame):
         self.zoomSlider.SetRange(1,1000)
         self.zoomSlider.SetValue(1000)
         self.buttonSizer.Add(self.zoomSlider, 1, wx.EXPAND|wx.ALL, 5)
-        self.zoomSlider.Bind(wx.EVT_SLIDER, self.ZoomSliderMoved)
+        self.zoomSlider.Bind(wx.EVT_SLIDER, self.OnZoomSliderMoved)
 
         self.frameSizer.Add(self.buttonSizer, 0, wx.EXPAND|wx.ALL, 5)
         
@@ -908,8 +966,7 @@ class AudioMapperFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnRemoveLastReflection, removeLastReflection)
         self.SetSize((800,600))
         self.SetTitle('Audiomapper')
-        self.Centre()
-        
+        self.Centre()        
 
     def OnCalibrate(self, e):
         cfg = getAudioConf()
@@ -1003,7 +1060,7 @@ class AudioMapperFrame(wx.Frame):
                 wx.MessageDialog(None, "Unable to open file to save", "Error", wx.OK|wx.STAY_ON_TOP|wx.CENTRE).ShowModal()
                                     
             
-    def ZoomSliderMoved(self, e):
+    def OnZoomSliderMoved(self, e):
         zoomv = self.zoomSlider.GetValue() * self.zoomSlider.GetValue() * 1.0e-6
         self.leftGraphPanel.SetZoom(zoomv)
         self.rightGraphPanel.SetZoom(zoomv)
@@ -1036,9 +1093,12 @@ class AudioMapperFrame(wx.Frame):
                 wx.Yield()
         dialog.Destroy()
         
-    def SampleButtonClicked(self, e):
+    def OnSampleButtonClicked(self, e):
         self.AcquireReflection()
 
+    def OnDisplayPositionsChecked(self, e):
+        self.Refresh()
+        
     def AcquireReflection(self):
         cfg = getAudioConf()
         sample_rate = cfg.ReadInt("sample_rate",44100)
@@ -1056,6 +1116,9 @@ class AudioMapperFrame(wx.Frame):
         strn = ("Left delay {0:.4g} ms\nRight delay {1:.4g} ms").format(reflection.GetLeftDelay()*1000.0,reflection.GetRightDelay()*1000.0)
         self.delayStaticText.SetLabel(strn)        
         self.changedReflections = True
+ 
+    def GetReflectionList(self):
+        return self.reflectionList, self.displayPositionsCheck.GetValue()
             
 def main():
     app = wx.App()
