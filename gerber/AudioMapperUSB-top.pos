@@ -1,4 +1,4 @@
-### Module positions - created on 01/31/21 22:48:19 ###
+### Module positions - created on 02/26/21 10:33:55 ###
 ### Printed by Pcbnew version kicad 4.0.7
 ## Unit = mm, Angle = deg.
 ## Side : top
@@ -6,7 +6,7 @@
 C1        10 uF          CP_1206_HandSoldering                            93.9800   -32.7660  180.0000  top
 C2        10 uF          CP_1206_HandSoldering                           108.5000   -46.0000   90.0000  top
 C3        1 uF           C_0805_HandSoldering                            113.5000   -48.0000   90.0000  top
-C4        10 uF          CP_1206_HandSoldering                            47.7000   -54.3000  270.0000  top
+C4        10 uF          CP_1206_HandSoldering                            46.9000   -54.2000   90.0000  top
 C5        1 uF           C_0805_HandSoldering                             57.4000   -50.2000  270.0000  top
 C6        10 uF          CP_1206_HandSoldering                            99.0000   -53.7000  180.0000  top
 C7        1 uF           C_0805_HandSoldering                            104.0000   -65.2000   90.0000  top
@@ -27,10 +27,8 @@ C25       1 uF           C_0805_HandSoldering                            108.040
 C26       1 uF           C_0805_HandSoldering                             63.7000   -58.4000  270.0000  top
 C27       10 uF          CP_1206_HandSoldering                            48.8000  -114.5000  180.0000  top
 C28       1 uF           C_0805_HandSoldering                             56.1000  -114.6000  180.0000  top
-C29       10 uF          CP_1206_HandSoldering                            44.2000   -56.4000  270.0000  top
 C30       10 uF          CP_1206_HandSoldering                            58.0000   -45.3000    0.0000  top
-C31       10 uF          CP_1206_HandSoldering                            47.4000   -68.5000  270.0000  top
-C32       10 uF          CP_1206_HandSoldering                            47.4000   -78.2000    0.0000  top
+C31       10 uF          CP_1206_HandSoldering                            47.4000   -75.1000  270.0000  top
 C33       1 uF           C_0805_HandSoldering                             76.9000   -51.0000  270.0000  top
 C34       1 uF           C_0805_HandSoldering                             82.9000   -58.7000  270.0000  top
 C36       10 uF          CP_1206_HandSoldering                            79.2000   -47.2000    0.0000  top
@@ -70,12 +68,10 @@ R29       10k            R_0805_HandSoldering                             85.690
 R30       18k            R_0805_HandSoldering                             68.2000   -61.9000  180.0000  top
 R32       1M             R_0805_HandSoldering                             89.9400  -124.8400   90.0000  top
 R33       1M             R_0805_HandSoldering                            108.1300  -101.6900    0.0000  top
-R34       4k7            R_0805_HandSoldering                             43.5000   -50.6000    0.0000  top
 R35       18k            R_0805_HandSoldering                             75.2000   -76.3000   90.0000  top
-R36       4k7            R_0805_HandSoldering                             47.7000   -62.1000   90.0000  top
+R36       4k7            R_0805_HandSoldering                             46.5000   -62.1000   90.0000  top
 R38       100k           R_0805_HandSoldering                             62.5000   -48.0000    0.0000  top
-R40       4k7            R_0805_HandSoldering                             45.6000   -74.3000   90.0000  top
-R42       4k7            R_0805_HandSoldering                             49.1000   -74.2000   90.0000  top
+R42       4k7            R_0805_HandSoldering                             47.3000   -68.2000   90.0000  top
 R44       100k           R_0805_HandSoldering                             58.6000   -66.2000    0.0000  top
 R46       1k5            R_0805_HandSoldering                             89.5000   -53.1000   90.0000  top
 R47       1k5            R_0805_HandSoldering                             80.4000   -72.3000   90.0000  top
@@ -95,8 +91,6 @@ R65       10k            R_0805_HandSoldering                            101.000
 R66       100k           R_0805_HandSoldering                             85.5000   -64.8000    0.0000  top
 R67       100R           R_0805_HandSoldering                            112.2600   -94.0500  180.0000  top
 R68       100k           R_0805_HandSoldering                             80.6000  -108.0000  180.0000  top
-R69       1k             R_0805_HandSoldering                             44.1000   -45.5000   90.0000  top
-R70       1k             R_0805_HandSoldering                             44.7000   -68.6000   90.0000  top
 U1        AMS1117-3.3    SOT-223-3_TabPin2                                90.2500   -38.5000  180.0000  top
 U2        PCM2900        SSOP-28_5.3x10.2mm_Pitch0.65mm                  110.0000   -56.0000  270.0000  top
 U3        OPA2170        SOIC-8_3.9x4.9mm_Pitch1.27mm                    100.5800  -108.6900  270.0000  top

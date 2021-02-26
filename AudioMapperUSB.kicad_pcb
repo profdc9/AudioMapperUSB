@@ -37,7 +37,7 @@
   )
 
   (setup
-    (last_trace_width 0.35)
+    (last_trace_width 0.25)
     (user_trace_width 0.35)
     (user_trace_width 0.5)
     (user_trace_width 1)
@@ -6423,7 +6423,7 @@
   (gr_text OPAMP (at 59.4 57.2) (layer F.SilkS)
     (effects (font (size 1 1) (thickness 0.15)))
   )
-  (gr_text "AUDIOMAPPER USB\nINTERFACE V2\nBY DANIEL MARKS\nCC-BY-SA 4.0" (at 65.1 92.5) (layer F.SilkS)
+  (gr_text "AUDIOMAPPER USB\nINTERFACE V2.1\nBY DANIEL MARKS\nCC-BY-SA 4.0" (at 65.1 92.5) (layer F.SilkS)
     (effects (font (size 1.5 1.5) (thickness 0.3)))
   )
   (gr_text INPUT (at 93.6 58.1) (layer F.SilkS)
