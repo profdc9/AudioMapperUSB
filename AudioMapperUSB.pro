@@ -1,4 +1,4 @@
-update=2/9/2021 10:22:01 PM
+update=3/21/2021 11:54:29 PM
 version=1
 last_client=kicad
 [pcbnew]
@@ -62,6 +62,7 @@ LibName30=atmel
 LibName31=contrib
 LibName32=valves
 LibName33=pcm2900
+LibName34=xlr4
 [schematic_editor]
 version=1
 PageLayoutDescrFile=
